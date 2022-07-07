@@ -363,6 +363,7 @@ final, messy, cat_clf, df, product = clf()
 ################################## Definir índice utilizado no ILOC ##################################
 if 'count' not in st.session_state:
     st.session_state.count = 0
+    st.session_state.dict_saneados = {}
 
 
 ################################## Funções atribuídas aos botões ##################################
@@ -375,6 +376,10 @@ def previous_item():
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
 def update_data(id_item, nm_product):
+    
+    # Get id_product
+    st.session_state.dict_saneados[str(id_item)] = [nm_product,cat]
+    
     id_product = product[product.nm_product == nm_product].id_product.tolist()[0]
     messy.loc[st.session_state.count, 'id_product'] = id_product
     df.loc[df.id_item == id_item, 'nm_product'] = nm_product
@@ -390,48 +395,60 @@ def update_data(id_item, nm_product):
 
 
 ################################## Página principal (bloco superior) ##################################
-l, r = st.columns([4,1])
-with l:
-    st.header('Saneamento Ativo')
-    st.dataframe(pd.DataFrame(messy.loc[st.session_state.count,['id_item','id_product','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
-with r:
-    st.header('Categorização')
-    cat = cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tfidf')[0]
-    lst = [x for x in product.nm_product.tolist() if x != cat]
-    lst.insert(0, cat)
-    x = st.selectbox(label='Selecione a categoria do item:', options=lst)
-    
+def main_page():
+    l, r = st.columns([4,1])
+    with l:
+        st.header('Saneamento Ativo')
+        st.dataframe(pd.DataFrame(messy.loc[st.session_state.count,['id_item','id_product','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
+    with r:
+        st.header('Categorização')
+        cat = cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tfidf')[0]
+        lst = [x for x in product.nm_product.tolist() if x != cat]
+        lst.insert(0, cat)
+        x = st.selectbox(label='Selecione a categoria do item:', options=lst)
 
 
-################################## Página principal (linha de botôes) ##################################
-a,b,c,d,e,f,g,h,i,j = st.columns([1,1,1,1,1,1,1,0.5,0.5,0.5])
 
-with h:
-    if st.button('Atualizar'):
-        update_data(nm_product=x, id_item=messy.loc[st.session_state.count].id_item)
-with j:
-    st.button('Next', on_click=next_item)
-with i:
-    if st.session_state.count > 0:
-        st.button('Previous', on_click=previous_item)
+    ################################## Página principal (linha de botôes) ##################################
+    a,b,c,d,e,f,g,h,i,j = st.columns([1,1,1,1,1,1,1,0.5,0.5,0.5])
 
-"---"
-################################## Página principal (bloco inferior) ##################################
-l, m, r = st.columns(3)
-with l:
-    st.subheader('Fuzzy Match - Sugestões')
-    st.table(final.loc[final.desc == messy.loc[st.session_state.count, 'nm_item'], ['Result','nm_product','Ratio']].sort_values('Ratio', ascending=False)) 
-with m:
-    st.subheader('Machine Learning - Sugestões')
-    pred = pd.DataFrame({'tf': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tf'),
-                        'tf_norm': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tf_norm'),
-                        'cossim': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='cossim'),
-                        'tfidf': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tfidf')}, index = ['CLASS']).T
-    st.table(pred)
-with r:
-    st.subheader('Itens com mesmo GTIN')
-    st.table(df.loc[df.gtin.isin(df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()), ['id_item','nm_item','gtin','nm_product']])
+    with h:
+        if st.button('Atualizar'):
+            update_data(nm_product=x, id_item=messy.loc[st.session_state.count].id_item)
+    with j:
+        st.button('Next', on_click=next_item)
+    with i:
+        if st.session_state.count > 0:
+            st.button('Previous', on_click=previous_item)
 
+    "---"
+    ################################## Página principal (bloco inferior) ##################################
+    l, m, r = st.columns(3)
+    with l:
+        st.subheader('Fuzzy Match - Sugestões')
+        st.table(final.loc[final.desc == messy.loc[st.session_state.count, 'nm_item'], ['Result','nm_product','Ratio']].sort_values('Ratio', ascending=False)) 
+    with m:
+        st.subheader('Machine Learning - Sugestões')
+        pred = pd.DataFrame({'tf': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tf'),
+                            'tf_norm': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tf_norm'),
+                            'cossim': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='cossim'),
+                            'tfidf': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tfidf')}, index = ['CLASS']).T
+        st.table(pred)
+    with r:
+        st.subheader('Itens com mesmo GTIN')
+        st.table(df.loc[df.gtin.isin(df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()), ['id_item','nm_item','gtin','nm_product']])
+
+def second_page():
+    col1, col2 = st.columns(2)
+    col1.metric("Saneados", len(st.session_state.dict_saneados))
+    col2.metric("Categorização Correta", sum([x[0] == x[1] for x in st.session_state.dict_saneados.values()]))
+
+page_names_to_funcs = {
+    "Saneamento": main_page,
+    "Acompanhamento": second_page
+}
+selected_page = st.sidebar.radio("Selecione a página", page_names_to_funcs.keys())
+page_names_to_funcs[selected_page]()
 
 # sqlcmd = """
 #     SELECT 
