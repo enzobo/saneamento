@@ -375,7 +375,7 @@ def previous_item():
     st.session_state.count -= 1
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
-def update_data(id_item, nm_product):
+def update_data(id_item, nm_product, cat):
     
     # Get id_product
     st.session_state.dict_saneados[str(id_item)] = [nm_product,cat]
