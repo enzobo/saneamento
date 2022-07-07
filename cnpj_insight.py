@@ -323,20 +323,24 @@ st.set_page_config(page_title="Saneamento Ativo",
                    layout="wide")
 
 ################################## Função para Obter Dados ##################################
-@st.cache(allow_output_mutation=True)
-def get_df():
-    with connect_azure_training() as conn:
-        df = pd.read_sql('SELECT * FROM sandbox.tbl_saneamento_teste', conn)
-        product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
-        df = df.merge(product, how='left')
-    return df, product
+#@st.cache(allow_output_mutation=True)
+#def get_df():
+#    with connect_azure_training() as conn:
+#        df = pd.read_sql('SELECT * FROM sandbox.tbl_saneamento_teste', conn)
+#        product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
+#        df = df.merge(product, how='left')
+#    return df, product
 
-df, product = get_df()
+#df, product = get_df()
 
 ################################## Função para Classificar Dados ##################################
 @st.cache(allow_output_mutation=True)
 def clf():
     with st.spinner('Categorizando itens...'):
+        with connect_azure_training() as conn:
+        df = pd.read_sql('SELECT * FROM sandbox.tbl_saneamento_teste', conn)
+        product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
+        df = df.merge(product, how='left')
         messy = df[df.id_product.isna()].reset_index().drop(columns='index')
         clean = df[~df.id_product.isna()]
         df_result = (messy.pipe(fuzzy_tf_idf, # Function and messy data
@@ -351,9 +355,9 @@ def clf():
         cat.build_model(clean.nm_item)
         cat.fit(description=clean.nm_item, classification=clean.nm_product)
 
-        return final, messy, cat
+        return final, messy, cat, df, product
 
-final, messy, cat_clf = clf()
+final, messy, cat_clf, df, product = clf()
 
 
 ################################## Definir índice utilizado no ILOC ##################################
