@@ -4,6 +4,7 @@ import plotly.express as px
 from requests import head  # pip install plotly-express
 import streamlit as st  # pip install streamlit
 import json
+import pyodbc
 from unidecode import unidecode
 # Import module for data manipulation
 import pandas as pd
