@@ -1,13 +1,10 @@
-from turtle import update
 from matplotlib.pyplot import show
 import pandas as pd  # pip install pandas openpyxl
 import plotly.express as px
 from requests import head  # pip install plotly-express
 import streamlit as st  # pip install streamlit
-import sys
 import json
 from unidecode import unidecode
-import pyautogui
 # Import module for data manipulation
 import pandas as pd
 # Import module for linear algebra
