@@ -8,3 +8,4 @@ PyAutoGUI==0.9.53
 fuzzywuzzy==0.18.0
 matplotlib==3.4.1
 scikit_learn==1.1.1
+pyodbc==4.0.32
