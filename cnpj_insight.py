@@ -312,7 +312,7 @@ def connect_azure_training(database='datascience-neogrid'):
     server = 'datascience-neogrid.database.windows.net'
     username='rerodrigues'
     password = 'Analytics2021'
-    driver = 'SQL Server Native Client 11.0'
+    driver = 'ODBC Driver 17 for SQL Server'
     string_conexao = 'DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password+';'    
     return pyodbc.connect(string_conexao)
 
