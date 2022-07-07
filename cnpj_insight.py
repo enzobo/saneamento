@@ -310,9 +310,13 @@ def fuzzy_tf_idf(
     return result
 
 ################################## Importar Neodatabases ##################################
-sys.path.insert(1, 'C:\\Users\\eoestreich\\Documents\\python_training\\jup_lab\\masterdata')
-
-from neodatabases import *
+def connect_azure_training(database='datascience-neogrid'):
+    server = 'datascience-neogrid.database.windows.net'
+    username='rerodrigues'
+    password = 'Analytics2021'
+    driver = 'SQL Server Native Client 11.0'
+    string_conexao = 'DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password+';'    
+    return pyodbc.connect(string_conexao)
 
 
 ################################## Configurações de Página ##################################
