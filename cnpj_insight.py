@@ -338,22 +338,22 @@ st.set_page_config(page_title="Saneamento Ativo",
 def clf():
     with st.spinner('Categorizando itens...'):
         with connect_azure_training() as conn:
-        df = pd.read_sql('SELECT * FROM sandbox.tbl_saneamento_teste', conn)
-        product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
-        df = df.merge(product, how='left')
-        messy = df[df.id_product.isna()].reset_index().drop(columns='index')
-        clean = df[~df.id_product.isna()]
-        df_result = (messy.pipe(fuzzy_tf_idf, # Function and messy data
-                        column = 'nm_item', # Messy column in data
-                        clean = clean['nm_item'], # Master data (list)
-                        mapping_df = clean, # Master data
-                        col = 'Result') # Can be customized
-                    )
-        final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
+            df = pd.read_sql('SELECT * FROM sandbox.tbl_saneamento_teste', conn)
+            product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
+            df = df.merge(product, how='left')
+            messy = df[df.id_product.isna()].reset_index().drop(columns='index')
+            clean = df[~df.id_product.isna()]
+            df_result = (messy.pipe(fuzzy_tf_idf, # Function and messy data
+                            column = 'nm_item', # Messy column in data
+                            clean = clean['nm_item'], # Master data (list)
+                            mapping_df = clean, # Master data
+                            col = 'Result') # Can be customized
+                        )
+            final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
 
-        cat = NeoNLP()
-        cat.build_model(clean.nm_item)
-        cat.fit(description=clean.nm_item, classification=clean.nm_product)
+            cat = NeoNLP()
+            cat.build_model(clean.nm_item)
+            cat.fit(description=clean.nm_item, classification=clean.nm_product)
 
         return final, messy, cat, df, product
 
