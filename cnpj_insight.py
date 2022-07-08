@@ -451,9 +451,10 @@ def main_page():
         st.markdown('Nenhum item para sanear!')
 
 def second_page():
-    col1, col2 = st.columns(2)
-    col1.metric("Saneados", len(st.session_state.dict_saneados))
-    col2.metric("Categorização Correta", sum([x[0] == x[1] for x in st.session_state.dict_saneados.values()]))
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Não Saneados", st.session_state.n_saneados)
+    col2.metric("Saneados", len(st.session_state.dict_saneados))
+    col3.metric("Categorização Correta", sum([x[0] == x[1] for x in st.session_state.dict_saneados.values()]))
 
 page_names_to_funcs = {
     "Saneamento": main_page,
