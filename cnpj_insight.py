@@ -369,7 +369,7 @@ def clf():
 
                 return final, messy, cat, df, product
             else:
-                return None, None, None
+                return None, None, None, None, None
 
 final, messy, cat_clf, df, product = clf()
 
