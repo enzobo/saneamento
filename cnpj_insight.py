@@ -369,11 +369,11 @@ def clf():
                 cat.build_model(clean.nm_item)
                 cat.fit(description=clean.nm_item, classification=clean.nm_product)
 
-                return vectorizer, nbrs, messy, cat, df, product
+                return vectorizer, nbrs, clean, messy, cat, df, product
             else:
                 return None, None, None, None, None, None
 
-vectorizer, nbrs, messy, cat_clf, df, product = clf()
+vectorizer, nbrs, clean, messy, cat_clf, df, product = clf()
 
 
 ################################## Funções atribuídas aos botões ##################################
