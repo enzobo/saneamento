@@ -230,7 +230,7 @@ def preprocess_string(s):
 def build_vectorizer(
     clean: pd.Series,
     analyzer: str = 'word', 
-    ngram_range: Tuple[int, int] = (1, 4), 
+    ngram_range: Tuple[int, int] = (1, 1), 
     n_neighbors: int = 1, 
     **kwargs
     ) -> Tuple:
@@ -246,18 +246,17 @@ def build_vectorizer(
 def tfidf_nn(
     messy, 
     clean, 
-    vectorizer,
-    nbrs,
     n_neighbors = 5, 
     **kwargs
     ):
     # Fit clean data and transform messy data
+    vectorizer, nbrs = build_vectorizer(clean, n_neighbors = n_neighbors, **kwargs)
     input_vec = vectorizer.transform(messy)
 
     # Determine best possible matches
     distances, indices = nbrs.kneighbors(input_vec, n_neighbors = n_neighbors)
     nearest_values = [[y for i, y in enumerate(clean) if i in indices[l]] for l in range(len(indices))]
-    return nearest_values, distances, vectorizer
+    return nearest_values, distances
 
 # String matching - match fuzzy
 def find_matches_fuzzy(
@@ -279,15 +278,16 @@ def fuzzy_nn_match(
     clean,
     column,
     col,
+    n_neighbors = 100,
     limit = 5, **kwargs):
-    nearest_values, _, vec = tfidf_nn(messy, clean, **kwargs)
+    nearest_values, _ = tfidf_nn(messy, clean, n_neighbors, **kwargs)
 
     results = [find_matches_fuzzy(row, nearest_values[i], limit) for i, row in enumerate(messy)]
     df = pd.DataFrame(itertools.chain.from_iterable(results),
         columns = [column, col, 'Ratio']
         )
     df.rename(columns={'nm_item':'desc'}, inplace=True)
-    return df, vec
+    return df
 
 # String matching - Fuzzy
 def fuzzy_tf_idf(
@@ -297,14 +297,13 @@ def fuzzy_tf_idf(
     mapping_df: pd.DataFrame,
     col: str,
     analyzer: str = 'word',
-    ngram_range: Tuple[int, int] = (1, 3),
-    **kwargs
+    ngram_range: Tuple[int, int] = (1, 1)
     ) -> pd.Series:
     # Create vectorizer
     clean = clean.drop_duplicates().reset_index(drop = True)
     messy_prep = df[column].drop_duplicates().dropna().reset_index(drop = True).astype(str)
     #messy = messy_prep.apply(preprocess_string)
-    result, vec = fuzzy_nn_match(messy = messy_prep, clean = clean, column = column, col = col, n_neighbors = 15, **kwargs)
+    result = fuzzy_nn_match(messy = messy_prep, clean = clean, column = column, col = col, n_neighbors = 15)
     # Map value from messy to clean
     return result
 
@@ -356,24 +355,23 @@ def clf():
             if st.session_state.n_saneados > 0:
                 messy = df[df.id_product.isna()].reset_index().drop(columns='index')
                 clean = df[~df.id_product.isna()]
-#                 df_result = (messy.pipe(fuzzy_tf_idf, # Function and messy data
-#                                 column = 'nm_item', # Messy column in data
-#                                 clean = clean['nm_item'], # Master data (list)
-#                                 mapping_df = clean, # Master data
-#                                 col = 'Result') # Can be customized
-#                             )
-                vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=5)
-#                 final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
+                df_result = (messy.pipe(fuzzy_tf_idf, # Function and messy data
+                                column = 'nm_item', # Messy column in data
+                                clean = clean['nm_item'], # Master data (list)
+                                mapping_df = clean, # Master data
+                                col = 'Result') # Can be customized
+                            )
+                final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
 
                 cat = NeoNLP()
                 cat.build_model(clean.nm_item)
                 cat.fit(description=clean.nm_item, classification=clean.nm_product)
 
-                return vectorizer, nbrs, clean, messy, cat, df, product
+                return final, messy, cat, df, product
             else:
-                return None, None, None, None, None, None
+                return None, None, None, None, None
 
-vectorizer, nbrs, clean, messy, cat_clf, df, product = clf()
+final, messy, cat_clf, df, product = clf()
 
 
 ################################## Funções atribuídas aos botões ##################################
