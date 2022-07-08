@@ -345,7 +345,7 @@ def clf():
     with st.spinner('Categorizando itens...'):
         with connect_azure_training() as conn:
             # Get Data
-            df = pd.read_sql('SELECT * FROM sandbox.tbl_saneamento_teste', conn)
+            df = pd.read_sql('SELECT * FROM SANEAMENTO.ab_com_vendor', conn)
             product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
             df = df.merge(product, how='left')
             st.session_state.n_saneados = df[df.id_product.isna()].shape[0]
