@@ -332,38 +332,46 @@ st.set_page_config(page_title="Saneamento Ativo",
 #    return df, product
 
 #df, product = get_df()
+################################## Definir índice utilizado no ILOC ##################################
+if 'count' not in st.session_state:
+    st.session_state.count = 0
+    st.session_state.dict_saneados = {}
+    st.session_state.n_saneados = 0 
+    st.session_state.n_saneados_id = []
 
 ################################## Função para Classificar Dados ##################################
 @st.cache(allow_output_mutation=True)
 def clf():
     with st.spinner('Categorizando itens...'):
         with connect_azure_training() as conn:
+            # Get Data
             df = pd.read_sql('SELECT * FROM sandbox.tbl_saneamento_teste', conn)
             product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
             df = df.merge(product, how='left')
-            messy = df[df.id_product.isna()].reset_index().drop(columns='index')
-            clean = df[~df.id_product.isna()]
-            df_result = (messy.pipe(fuzzy_tf_idf, # Function and messy data
-                            column = 'nm_item', # Messy column in data
-                            clean = clean['nm_item'], # Master data (list)
-                            mapping_df = clean, # Master data
-                            col = 'Result') # Can be customized
-                        )
-            final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
+            st.session_state.n_saneados = df[df.id_product.isna()].shape[0]
+            st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
+            
+            # Check for NULLs
+            if st.session_state.n_saneados > 0:
+                messy = df[df.id_product.isna()].reset_index().drop(columns='index')
+                clean = df[~df.id_product.isna()]
+                df_result = (messy.pipe(fuzzy_tf_idf, # Function and messy data
+                                column = 'nm_item', # Messy column in data
+                                clean = clean['nm_item'], # Master data (list)
+                                mapping_df = clean, # Master data
+                                col = 'Result') # Can be customized
+                            )
+                final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
 
-            cat = NeoNLP()
-            cat.build_model(clean.nm_item)
-            cat.fit(description=clean.nm_item, classification=clean.nm_product)
+                cat = NeoNLP()
+                cat.build_model(clean.nm_item)
+                cat.fit(description=clean.nm_item, classification=clean.nm_product)
 
-        return final, messy, cat, df, product
+                return final, messy, cat, df, product
+            else:
+                return None, None, None
 
 final, messy, cat_clf, df, product = clf()
-
-
-################################## Definir índice utilizado no ILOC ##################################
-if 'count' not in st.session_state:
-    st.session_state.count = 0
-    st.session_state.dict_saneados = {}
 
 
 ################################## Funções atribuídas aos botões ##################################
@@ -379,6 +387,7 @@ def update_data(id_item, nm_product, cat):
     
     # Get id_product
     st.session_state.dict_saneados[str(id_item)] = [nm_product,cat]
+    st.session_state.n_saneados = len([x for x in st.session_state.n_saneados_id if str(x) not in st.session_state.dict_saneados.keys()])
     
     id_product = product[product.nm_product == nm_product].id_product.tolist()[0]
     messy.loc[st.session_state.count, 'id_product'] = id_product
@@ -396,7 +405,7 @@ def update_data(id_item, nm_product, cat):
 
 ################################## Página principal (bloco superior) ##################################
 def main_page():
-    if messy[messy.id_product.isna()].shape[0] > 0:
+    if st.session_state.n_saneados > 0:
         l, r = st.columns([4,1])
         with l:
             st.header('Saneamento Ativo')
@@ -439,7 +448,7 @@ def main_page():
             st.subheader('Itens com mesmo GTIN')
             st.table(df.loc[df.gtin.isin(df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()), ['id_item','nm_item','gtin','nm_product']])
     else:
-        st.markdown('Nenhum item para sanear')
+        st.markdown('Nenhum item para sanear!')
 
 def second_page():
     col1, col2 = st.columns(2)
