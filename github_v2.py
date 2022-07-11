@@ -339,7 +339,7 @@ if 'count' not in st.session_state:
     st.session_state.n_saneados_id = []
 
 ################################## Função para Classificar Dados ##################################
-@st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True, show_spinner=False)
 def get_df():
     with connect_azure_training() as conn:
       # Get Data
