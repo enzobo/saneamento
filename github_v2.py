@@ -367,8 +367,9 @@ def clf():
         return None, None, None, None, None
 
 with st.spinner('Categorizando itens...'):
-  vectorizer, nbrs, clean, messy, cat_clf = clf()
-  df, product = get_df()
+    df, product = get_df()
+    vectorizer, nbrs, clean, messy, cat_clf = clf()
+  
 
 
 ################################## Funções atribuídas aos botões ##################################
