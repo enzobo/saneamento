@@ -350,6 +350,7 @@ def get_df():
       st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
       return df, product
 
+@st.experimental_memo
 def clf():   
     # Check for NULLs
     if st.session_state.n_saneados > 0:
