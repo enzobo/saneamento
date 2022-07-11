@@ -350,6 +350,11 @@ def get_df():
       st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
       return df, product
 
+@st.cache(allow_output_mutation=True)
+def get_gtin_itens(id):
+    return df.loc[df.gtin.isin(df.loc[df.id_item == messy.loc[id, 'id_item']].gtin.tolist()), ['id_item','nm_item','gtin','nm_product']]
+
+
 @st.experimental_memo(show_spinner=False)
 def clf():   
     # Check for NULLs
@@ -450,7 +455,7 @@ def main_page():
 #             st.table(pred)
         with r:
             st.subheader('Itens com mesmo GTIN')
-            st.table(df.loc[df.gtin.isin(df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()), ['id_item','nm_item','gtin','nm_product']])
+            st.table(get_gtin_itens(id=st.session_state.count))
     else:
         st.markdown('Nenhum item para sanear!')
 
