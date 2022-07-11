@@ -349,7 +349,6 @@ def get_df():
       df = df.merge(product, how='left')
       st.session_state.n_saneados = df[df.id_product.isna()].shape[0]
       st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
-      st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
       return df, product
 
 @st.cache(allow_output_mutation=True, show_spinner=False)
@@ -363,6 +362,7 @@ def clf():
     if st.session_state.n_saneados > 0:
         messy = df[df.id_product.isna()].reset_index().drop(columns='index')
         clean = df[~df.id_product.isna()]
+        st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
         vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=1)
 
         cat = NeoNLP()
