@@ -353,19 +353,18 @@ def get_df():
 @st.experimental_memo
 def clf():   
     # Check for NULLs
-    with st.spinner('Categorizando itens...'):
-        if st.session_state.n_saneados > 0:
-            messy = df[df.id_product.isna()].reset_index().drop(columns='index')
-            clean = df[~df.id_product.isna()]
-            vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=5)
+    if st.session_state.n_saneados > 0:
+        messy = df[df.id_product.isna()].reset_index().drop(columns='index')
+        clean = df[~df.id_product.isna()]
+        vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=5)
 
-            cat = NeoNLP()
-            cat.build_model(clean.nm_item)
-            cat.fit(description=clean.nm_item, classification=clean.nm_product)
+        cat = NeoNLP()
+        cat.build_model(clean.nm_item)
+        cat.fit(description=clean.nm_item, classification=clean.nm_product)
 
-            return vectorizer, nbrs, clean, messy, cat
-        else:
-            return None, None, None, None, None
+        return vectorizer, nbrs, clean, messy, cat
+    else:
+        return None, None, None, None, None
 
 
 df, product = get_df()
