@@ -356,7 +356,7 @@ def get_gtin_itens():
     return df.loc[df.gtin.isin(st.session_state.gtin_lst), ['id_item','nm_item','gtin','nm_product']]
 
 
-@st.experimental_memo(show_spinner=False)
+@st.cache(allow_output_mutation=True, show_spinner=False)
 def clf():   
     # Check for NULLs
     if st.session_state.n_saneados > 0:
