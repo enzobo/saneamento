@@ -340,38 +340,34 @@ if 'count' not in st.session_state:
 
 ################################## Função para Classificar Dados ##################################
 @st.cache(allow_output_mutation=True)
-def clf():
-    with st.spinner('Categorizando itens...'):
-        with connect_azure_training() as conn:
-            # Get Data
-            df = pd.read_sql('SELECT * FROM SANEAMENTO.ab_com_vendor', conn)
-            product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
-            df = df.merge(product, how='left')
-            st.session_state.n_saneados = df[df.id_product.isna()].shape[0]
-            st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
-            
-            # Check for NULLs
-            if st.session_state.n_saneados > 0:
-                messy = df[df.id_product.isna()].reset_index().drop(columns='index')
-                clean = df[~df.id_product.isna()]
-#                 df_result = (messy.pipe(fuzzy_tf_idf, # Function and messy data
-#                                 column = 'nm_item', # Messy column in data
-#                                 clean = clean['nm_item'], # Master data (list)
-#                                 mapping_df = clean, # Master data
-#                                 col = 'Result') # Can be customized
-#                             )
-                vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=5)
-#                 final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
+def get_df():
+    with connect_azure_training() as conn:
+      # Get Data
+      df = pd.read_sql('SELECT * FROM SANEAMENTO.ab_com_vendor', conn)
+      product = pd.read_sql('SELECT id_product, nm_product FROM tbl_product', conn)
+      df = df.merge(product, how='left')
+      st.session_state.n_saneados = df[df.id_product.isna()].shape[0]
+      st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
+      return df, product
 
-                cat = NeoNLP()
-                cat.build_model(clean.nm_item)
-                cat.fit(description=clean.nm_item, classification=clean.nm_product)
+def clf():   
+    # Check for NULLs
+    if st.session_state.n_saneados > 0:
+        messy = df[df.id_product.isna()].reset_index().drop(columns='index')
+        clean = df[~df.id_product.isna()]
+        vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=5)
 
-                return vectorizer, nbrs, clean, messy, cat, df, product
-            else:
-                return None, None, None, None, None, None
+        cat = NeoNLP()
+        cat.build_model(clean.nm_item)
+        cat.fit(description=clean.nm_item, classification=clean.nm_product)
 
-vectorizer, nbrs, clean, messy, cat_clf, df, product = clf()
+        return vectorizer, nbrs, clean, messy, cat
+    else:
+        return None, None, None, None
+
+with st.spinner('Categorizando itens...'):
+  vectorizer, nbrs, clean, messy, cat_clf = clf()
+  df, product = get_df()
 
 
 ################################## Funções atribuídas aos botões ##################################
