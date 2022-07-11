@@ -356,19 +356,22 @@ def clf():
     if st.session_state.n_saneados > 0:
         messy = df[df.id_product.isna()].reset_index().drop(columns='index')
         clean = df[~df.id_product.isna()]
-        vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=5)
+        #vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=5)
 
         cat = NeoNLP()
         cat.build_model(clean.nm_item)
         cat.fit(description=clean.nm_item, classification=clean.nm_product)
 
-        return vectorizer, nbrs, clean, messy, cat
+        #return vectorizer, nbrs, clean, messy, cat
+        return clean, messy, cat
+        
     else:
-        return None, None, None, None, None
+        return None, None, None
 
 
 df, product = get_df()
-vectorizer, nbrs, clean, messy, cat_clf = clf()
+#vectorizer, nbrs, clean, messy, cat_clf = clf()
+clean, messy, cat_clf = clf()
   
 
 
@@ -432,11 +435,11 @@ def main_page():
         "---"
         ################################## Página principal (bloco inferior) ##################################
         l, m, r = st.columns(3)
-        with l:
-            st.subheader('Fuzzy Match - Sugestões')
-            df_result = fuzzy_tf_idf(df=pd.DataFrame(messy.loc[st.session_state.count,:]).T,clean=clean.nm_item,column='nm_item',col='Result',mapping_df=clean,nbrs=nbrs,vectorizer=vectorizer)
-            final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
-            st.table(final.loc[final.desc == messy.loc[st.session_state.count, 'nm_item'], ['Result','nm_product','Ratio']].sort_values('Ratio', ascending=False)) 
+#         with l:
+#             st.subheader('Fuzzy Match - Sugestões')
+#             df_result = fuzzy_tf_idf(df=pd.DataFrame(messy.loc[st.session_state.count,:]).T,clean=clean.nm_item,column='nm_item',col='Result',mapping_df=clean,nbrs=nbrs,vectorizer=vectorizer)
+#             final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
+#             st.table(final.loc[final.desc == messy.loc[st.session_state.count, 'nm_item'], ['Result','nm_product','Ratio']].sort_values('Ratio', ascending=False)) 
         with m:
             st.subheader('Machine Learning - Sugestões')
             pred = pd.DataFrame({'tf': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tf'),
