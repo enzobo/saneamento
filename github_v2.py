@@ -339,7 +339,7 @@ if 'count' not in st.session_state:
     st.session_state.n_saneados_id = []
 
 ################################## Função para Classificar Dados ##################################
-@st.cache(allow_output_mutation=True, show_spinner=False, ttl=24*60*60)
+@st.cache(allow_output_mutation=True, show_spinner=False)
 def get_df():
     with connect_azure_training() as conn:
       # Get Data
@@ -350,7 +350,7 @@ def get_df():
       st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
       return df, product
 
-@st.experimental_memo(show_spinner=False, ttl=24*60*60)
+@st.experimental_memo(show_spinner=False)
 def clf():   
     # Check for NULLs
     if st.session_state.n_saneados > 0:
