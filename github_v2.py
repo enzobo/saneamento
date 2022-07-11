@@ -337,6 +337,7 @@ if 'count' not in st.session_state:
     st.session_state.dict_saneados = {}
     st.session_state.n_saneados = 0 
     st.session_state.n_saneados_id = []
+    st.session_state.gtin_lst = []
 
 ################################## Função para Classificar Dados ##################################
 @st.cache(allow_output_mutation=True, show_spinner=False)
@@ -348,11 +349,12 @@ def get_df():
       df = df.merge(product, how='left')
       st.session_state.n_saneados = df[df.id_product.isna()].shape[0]
       st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
+      st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
       return df, product
 
-@st.cache(allow_output_mutation=True)
-def get_gtin_itens(id):
-    return df.loc[df.gtin.isin(df.loc[df.id_item == messy.loc[id, 'id_item']].gtin.tolist()), ['id_item','nm_item','gtin','nm_product']]
+@st.cache(allow_output_mutation=True, show_spinner=False)
+def get_gtin_itens():
+    return df.loc[df.gtin.isin(st.session_state.gtin_lst), ['id_item','nm_item','gtin','nm_product']]
 
 
 @st.experimental_memo(show_spinner=False)
@@ -383,10 +385,12 @@ vectorizer, nbrs, clean, messy, cat_clf = clf()
 ################################## Funções atribuídas aos botões ##################################
 def next_item():
     st.session_state.count += 1
+    st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
 def previous_item():
     st.session_state.count -= 1
+    st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
 def update_data(id_item, nm_product, cat):
@@ -455,7 +459,7 @@ def main_page():
 #             st.table(pred)
         with r:
             st.subheader('Itens com mesmo GTIN')
-            st.table(get_gtin_itens(id=st.session_state.count))
+            st.table(get_gtin_itens())
     else:
         st.markdown('Nenhum item para sanear!')
 
