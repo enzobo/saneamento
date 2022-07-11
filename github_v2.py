@@ -364,7 +364,7 @@ def clf():
 
         return vectorizer, nbrs, clean, messy, cat
     else:
-        return None, None, None, None
+        return None, None, None, None, None
 
 with st.spinner('Categorizando itens...'):
   vectorizer, nbrs, clean, messy, cat_clf = clf()
