@@ -354,7 +354,7 @@ def get_df():
 
 @st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
 def get_gtin_itens():
-    return df.loc[df.gtin.isin(df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()), ['nm_item','nm_product']]
+    return df.loc[df.gtin.isin(st.session_state.gtin_lst), ['nm_item','nm_product']]
 
 
 @st.experimental_memo(show_spinner=False, ttl=60*60*24)
@@ -386,7 +386,7 @@ vectorizer, nbrs, clean, messy, cat_clf = clf()
 ################################## Funções atribuídas aos botões ##################################
 def next_item():
     st.session_state.count += 1
-    #st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
+    st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
 def previous_item():
@@ -407,8 +407,8 @@ def update_data(id_item, nm_product, cat):
     st.session_state.n_saneados = len([x for x in st.session_state.n_saneados_id if str(x) not in st.session_state.dict_saneados.keys()])
     
     id_product = product[product.nm_product == nm_product].id_product.tolist()[0]
-    messy.loc[st.session_state.count, 'id_product'] = id_product
-    df.loc[df.id_item == id_item, 'nm_product'] = nm_product
+    #messy.loc[st.session_state.count, 'id_product'] = id_product
+    #df.loc[df.id_item == id_item, 'nm_product'] = nm_product
     with connect_azure_training() as conn:
         cursor = conn.cursor()
 
