@@ -415,7 +415,7 @@ def update_data(id_item, nm_product, cat):
 
 ################################## Página principal (bloco superior) ##################################
 def main_page():
-    if st.session_state.n_saneados > 0:
+    if df[df.id_product.isna()].shape[0] > 0:
         l, r = st.columns([4,1])
         with l:
             st.header('Saneamento Ativo')
