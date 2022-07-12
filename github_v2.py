@@ -233,7 +233,8 @@ def build_vectorizer(
     **kwargs
     ) -> Tuple:
     # Create vectorizer
-    vectorizer = TfidfVectorizer(analyzer = analyzer, ngram_range = ngram_range, **kwargs)
+    #vectorizer = TfidfVectorizer(analyzer = analyzer, ngram_range = ngram_range, **kwargs)
+    vectorizer = CountVectorizer(analyzer = analyzer, ngram_range = ngram_range)
     X = vectorizer.fit_transform(clean.values.astype('U'))
 
     # Fit nearest neighbors corpus
@@ -363,7 +364,7 @@ def clf():
         messy = df[df.id_product.isna()].reset_index().drop(columns='index')
         clean = df[~df.id_product.isna()]
         st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
-        vectorizer, nbrs = build_vectorizer(clean=clean.nm_item,n_neighbors=1)
+        vectorizer, nbrs = build_vectorizer(clean=clean.nm_item.drop_duplicates().reset_index(drop = True),n_neighbors=1)
 
         cat = NeoNLP()
         cat.build_model(clean.nm_item)
