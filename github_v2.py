@@ -393,6 +393,11 @@ def previous_item():
     st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
+
+def jump2index():
+    if st.session_state.new_index != "":
+        st.session_state.count = eval(st.session_state.new_index)
+        
 def update_data(id_item, nm_product, cat):
     
     # Get id_product
@@ -444,8 +449,8 @@ def main_page():
         "---"
         ################################## Página principal (bloco inferior) ##################################
         l, m, r = st.columns(3)
-        if st.button('Sugestões Fuzzy'):
-            with l:
+        with l:
+            if st.button('Sugestões Fuzzy'):
                 st.subheader('Fuzzy Match - Sugestões')
                 df_result = fuzzy_tf_idf(df=pd.DataFrame(messy.loc[st.session_state.count,:]).T,clean=clean.nm_item,column='nm_item',col='Result',mapping_df=clean,nbrs=nbrs,vectorizer=vectorizer)
                 final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
@@ -460,6 +465,7 @@ def main_page():
         with r:
             st.subheader('Itens com mesmo GTIN')
             st.table(get_gtin_itens())
+            st.text_input(label='Escolha um índice para avançar:', on_change=jump2index, key='new_index')
     else:
         st.markdown('Nenhum item para sanear!')
 
