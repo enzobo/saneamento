@@ -340,7 +340,7 @@ if 'count' not in st.session_state:
     st.session_state.gtin_lst = []
 
 ################################## Função para Classificar Dados ##################################
-@st.cache(allow_output_mutation=True, show_spinner=False)
+@st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
 def get_df():
     with connect_azure_training() as conn:
       # Get Data
@@ -351,12 +351,12 @@ def get_df():
       st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
       return df, product
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
+@st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
 def get_gtin_itens():
     return df.loc[df.gtin.isin(st.session_state.gtin_lst), ['id_item','nm_item','gtin','nm_product']]
 
 
-@st.experimental_memo(show_spinner=False)
+@st.experimental_memo(show_spinner=False, ttl=60*60*24)
 def clf():   
     # Check for NULLs
     if st.session_state.n_saneados > 0:
