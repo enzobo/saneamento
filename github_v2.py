@@ -398,6 +398,7 @@ def previous_item():
 def jump2index():
     if st.session_state.new_index != "":
         st.session_state.count = eval(st.session_state.new_index)
+        st.session_state.new_index = ""
         
 def update_data(id_item, nm_product, cat):
     
