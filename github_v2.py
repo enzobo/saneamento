@@ -352,9 +352,9 @@ def get_df():
       st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
       return df, product
 
-@st.experimental_memo(show_spinner=False, ttl=60*60*24)
+@st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
 def get_gtin_itens():
-    return df.loc[df.gtin.isin(st.session_state.gtin_lst), ['id_item','nm_item','gtin','nm_product']]
+    return df.loc[df.gtin.isin(df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()), ['nm_item','nm_product']]
 
 
 @st.experimental_memo(show_spinner=False, ttl=60*60*24)
@@ -386,7 +386,7 @@ vectorizer, nbrs, clean, messy, cat_clf = clf()
 ################################## Funções atribuídas aos botões ##################################
 def next_item():
     st.session_state.count += 1
-    st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
+    #st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
 def previous_item():
