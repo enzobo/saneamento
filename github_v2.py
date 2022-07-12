@@ -466,7 +466,7 @@ def main_page():
 #             st.table(pred)
         with r:
             st.subheader('Itens com mesmo GTIN')
-            st.table(get_gtin_itens(id=np.random.randint(10000000))
+            st.table(get_gtin_itens(id=np.random.randint(10000000)))
             st.text_input(label='Escolha um índice para avançar:', on_change=jump2index, key='new_index')
     else:
         st.markdown('Nenhum item para sanear!')
