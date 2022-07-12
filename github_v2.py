@@ -352,7 +352,7 @@ def get_df():
       st.session_state.n_saneados_id = df[df.id_product.isna()].id_item.tolist()
       return df, product
 
-@st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
+@st.experimental_memo(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
 def get_gtin_itens():
     return df.loc[df.gtin.isin(st.session_state.gtin_lst), ['id_item','nm_item','gtin','nm_product']]
 
