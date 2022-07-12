@@ -353,7 +353,7 @@ def get_df():
       return df, product
 
 @st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
-def get_gtin_itens():
+def get_gtin_itens(id):
     return df.loc[df.gtin.isin(st.session_state.gtin_lst), ['nm_item','nm_product']]
 
 
@@ -466,7 +466,7 @@ def main_page():
 #             st.table(pred)
         with r:
             st.subheader('Itens com mesmo GTIN')
-            st.table(get_gtin_itens())
+            st.table(get_gtin_itens(id=np.random.randint(10000000))
             st.text_input(label='Escolha um índice para avançar:', on_change=jump2index, key='new_index')
     else:
         st.markdown('Nenhum item para sanear!')
