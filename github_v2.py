@@ -395,9 +395,15 @@ def previous_item():
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
 
+# def jump2index():
+#     if st.session_state.new_index != "":
+#         st.session_state.count = eval(st.session_state.new_index)
+#         st.session_state.new_index = ""
+
 def jump2index():
     if st.session_state.new_index != "":
-        st.session_state.count = eval(st.session_state.new_index)
+        idx = messy[messy.gtin == eval(st.session_state.new_index)].index
+        st.session_state.count = idx[0]
         st.session_state.new_index = ""
         
 def update_data(id_item, nm_product, cat):
@@ -467,7 +473,8 @@ def main_page():
         with r:
             st.subheader('Itens com mesmo GTIN')
             st.table(get_gtin_itens(id=np.random.randint(10000000)))
-            st.text_input(label='Escolha um índice para avançar:', on_change=jump2index, key='new_index')
+            #st.text_input(label='Escolha um índice para avançar:', on_change=jump2index, key='new_index')
+            st.text_input(label='Escolha um GTIN para avançar:', on_change=jump2index, key='new_index')
     else:
         st.markdown('Nenhum item para sanear!')
 
