@@ -428,14 +428,14 @@ def update_data(id_item, nm_product, cat):
 
 
 ################################## Página principal (bloco superior) ##################################
-messy = messy[messy.id_item.isin(st.session_state.n_saneados_id)]
+tst = messy[messy.id_item.isin(st.session_state.n_saneados_id)]
 
 def main_page():
     if df[df.id_product.isna()].shape[0] > 0:
         l, r = st.columns([4,1])
         with l:
             st.header('Saneamento Ativo')
-            st.dataframe(pd.DataFrame(messy.loc[st.session_state.count,['id_item','id_product','gtin','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
+            st.dataframe(pd.DataFrame(tst.loc[st.session_state.count,['id_item','id_product','gtin','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
         with r:
             st.header('Categorização')
             cat = cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tfidf')[0]
