@@ -383,7 +383,7 @@ vectorizer, nbrs, clean, messy, cat_clf = clf()
   
 #@st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
 def get_tst_df(df, id):
-    return df[~df.id_item.isin([x for x in id.keys()])]
+    return df[~df.id_item.isin([int(x) for x in id.keys()])]
 
 ################################## Funções atribuídas aos botões ##################################
 def next_item():
