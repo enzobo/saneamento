@@ -454,7 +454,7 @@ def main_page():
 
         with h:
             if st.button('Atualizar'):
-                update_data(nm_product=x, id_item=messy.loc[st.session_state.count].id_item, cat=cat)
+                update_data(nm_product=x, id_item=tst.loc[st.session_state.count].id_item, cat=cat)
         with j:
             st.button('Next', on_click=next_item)
         with i:
@@ -467,9 +467,9 @@ def main_page():
         with l:
             if st.button('Sugestões Fuzzy'):
                 st.subheader('Fuzzy Match - Sugestões')
-                df_result = fuzzy_tf_idf(df=pd.DataFrame(messy.loc[st.session_state.count,:]).T,clean=clean.nm_item,column='nm_item',col='Result',mapping_df=clean,nbrs=nbrs,vectorizer=vectorizer)
+                df_result = fuzzy_tf_idf(df=pd.DataFrame(tst.loc[st.session_state.count,:]).T,clean=clean.nm_item,column='nm_item',col='Result',mapping_df=clean,nbrs=nbrs,vectorizer=vectorizer)
                 final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
-                st.table(final.loc[final.desc == messy.loc[st.session_state.count, 'nm_item'], ['Result','nm_product','Ratio']].sort_values('Ratio', ascending=False)) 
+                st.table(final.loc[final.desc == tst.loc[st.session_state.count, 'nm_item'], ['Result','nm_product','Ratio']].sort_values('Ratio', ascending=False)) 
 #         with m:
 #             st.subheader('Machine Learning - Sugestões')
 #             pred = pd.DataFrame({'tf': cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tf'),
