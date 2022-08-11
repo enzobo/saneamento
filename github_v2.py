@@ -417,6 +417,7 @@ def update_data(id_item, nm_product, cat):
     st.session_state.n_saneados = len([x for x in st.session_state.n_saneados_id if str(x) not in st.session_state.dict_saneados.keys()])
     
     id_product = product[product.nm_product == nm_product].id_product.tolist()[0]
+    tst.drop(st.session_state.count, inplace=True)
     #messy.loc[st.session_state.count, 'id_product'] = id_product
     df.loc[df.id_item == id_item, 'nm_product'] = nm_product
     with connect_azure_training() as conn:
