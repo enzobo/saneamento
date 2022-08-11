@@ -357,7 +357,6 @@ def get_df():
 def get_gtin_itens(id):
     return df.loc[df.gtin.isin(st.session_state.gtin_lst), ['nm_item','nm_product']]
 
-
 @st.experimental_memo(show_spinner=False, ttl=60*60*24)
 def clf():   
     # Check for NULLs
@@ -382,7 +381,11 @@ df, product = get_df()
 vectorizer, nbrs, clean, messy, cat_clf = clf()
 #clean, messy, cat_clf = clf()
   
+@st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
+def get_tst_df(df, id):
+    return df[df.id_item.isin([id.keys()])
 
+tst = get_tst_df(df=messy, id=st.session_state.dict_saneados)
 
 ################################## Funções atribuídas aos botões ##################################
 def next_item():
@@ -399,8 +402,8 @@ def previous_item():
 def jump2index():
     if st.session_state.new_index != "":
         st.session_state.count = eval(st.session_state.new_index)
-        st.session_state.new_index = ""
-
+        st.session_state.new_index = ""        
+        
 # def jump2index():
 #     if st.session_state.new_index != "":
 #         idx = messy[messy.gtin == eval(st.session_state.new_index)].index
@@ -428,8 +431,6 @@ def update_data(id_item, nm_product, cat):
 
 
 ################################## Página principal (bloco superior) ##################################
-tst = messy[messy.id_item.isin([x for x in st.session_state.dict_saneados.keys()])]
-
 def main_page():
     if df[df.id_product.isna()].shape[0] > 0:
         l, r = st.columns([4,1])
