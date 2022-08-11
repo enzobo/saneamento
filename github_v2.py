@@ -381,9 +381,11 @@ df, product = get_df()
 vectorizer, nbrs, clean, messy, cat_clf = clf()
 #clean, messy, cat_clf = clf()
   
-#@st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
+@st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
 def get_tst_df(df, id):
-    return df[~df.id_item.isin([int(x) for x in id.keys()])]
+    temp = df[~df.id_item.isin([int(x) for x in id.keys()])]
+    final = temp.reset_index().drop(columns='index')
+    return final
 
 ################################## Funções atribuídas aos botões ##################################
 def next_item():
