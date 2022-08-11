@@ -467,7 +467,7 @@ def main_page():
         with l:
             if st.button('Sugestões Fuzzy'):
                 st.subheader('Fuzzy Match - Sugestões')
-                df_result = fuzzy_tf_idf(df=pd.DataFrame(messy.loc[(messy.id_item == tst.loc[st.session_state.count, 'id_item']), :]).T,clean=clean.nm_item,column='nm_item',col='Result',mapping_df=clean,nbrs=nbrs,vectorizer=vectorizer)
+                df_result = fuzzy_tf_idf(df=pd.DataFrame(messy.loc[(messy.id_item == tst.loc[st.session_state.count, 'id_item']), :]),clean=clean.nm_item,column='nm_item',col='Result',mapping_df=clean,nbrs=nbrs,vectorizer=vectorizer)
                 final = df_result.merge(df[['nm_item','id_product']], left_on='Result', right_on='nm_item').merge(product)
                 st.table(final.loc[final.desc == tst.loc[st.session_state.count, 'nm_item'], ['Result','nm_product','Ratio']].sort_values('Ratio', ascending=False)) 
 #         with m:
