@@ -385,8 +385,6 @@ vectorizer, nbrs, clean, messy, cat_clf = clf()
 def get_tst_df(df, id):
     return df[~df.id_item.isin([id.keys()])
 
-tst = get_tst_df(df=messy, id=st.session_state.dict_saneados)
-
 ################################## Funções atribuídas aos botões ##################################
 def next_item():
     st.session_state.count += 1
@@ -431,6 +429,7 @@ def update_data(id_item, nm_product, cat):
 
 
 ################################## Página principal (bloco superior) ##################################
+tst = get_tst_df(df=messy, id=st.session_state.dict_saneados)
 st.write(tst.shape[0])
 def main_page():
     if df[df.id_product.isna()].shape[0] > 0:
