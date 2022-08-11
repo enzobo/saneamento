@@ -428,7 +428,7 @@ def update_data(id_item, nm_product, cat):
 
 
 ################################## Página principal (bloco superior) ##################################
-tst = messy[~messy.id_item.isin(st.session_state.dict_saneados.keys())]
+tst = messy[messy.id_item.isin(st.session_state.dict_saneados.keys())]
 
 def main_page():
     if df[df.id_product.isna()].shape[0] > 0:
