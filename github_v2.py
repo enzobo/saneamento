@@ -383,7 +383,7 @@ vectorizer, nbrs, clean, messy, cat_clf = clf()
   
 @st.cache(allow_output_mutation=True, show_spinner=False, ttl=60*60*24)
 def get_tst_df(df, id):
-    return df[df.id_item.isin([id.keys()])
+    return df[~df.id_item.isin([id.keys()])
 
 tst = get_tst_df(df=messy, id=st.session_state.dict_saneados)
 
@@ -431,6 +431,7 @@ def update_data(id_item, nm_product, cat):
 
 
 ################################## Página principal (bloco superior) ##################################
+st.write(tst.shape[0])
 def main_page():
     if df[df.id_product.isna()].shape[0] > 0:
         l, r = st.columns([4,1])
