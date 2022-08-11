@@ -390,12 +390,12 @@ def get_tst_df(df, id):
 ################################## Funções atribuídas aos botões ##################################
 def next_item():
     st.session_state.count += 1
-    st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
+    st.session_state.gtin_lst = df.loc[df.id_item == tst.loc[st.session_state.count, 'id_item']].gtin.tolist()
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
 def previous_item():
     st.session_state.count -= 1
-    st.session_state.gtin_lst = df.loc[df.id_item == messy.loc[st.session_state.count, 'id_item']].gtin.tolist()
+    st.session_state.gtin_lst = df.loc[df.id_item == tst.loc[st.session_state.count, 'id_item']].gtin.tolist()
     #st.dataframe(pd.DataFrame(df.loc[st.session_state.count,['id_item','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
 
 
