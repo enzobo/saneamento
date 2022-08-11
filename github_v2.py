@@ -442,7 +442,7 @@ def main_page():
             st.dataframe(pd.DataFrame(tst.loc[st.session_state.count,['id_item','id_product','gtin','nm_item','nm_hierarchy_level_1','nm_hierarchy_level_2','nm_hierarchy_level_3']]).T)
         with r:
             st.header('Categorização')
-            cat = cat_clf.predict(text=messy.nm_item.tolist()[st.session_state.count], method='tfidf')[0]
+            cat = cat_clf.predict(text=tst.nm_item.tolist()[st.session_state.count], method='tfidf')[0]
             lst = [x for x in product.nm_product.tolist() if x != cat]
             lst.insert(0, cat)
             x = st.selectbox(label='Selecione a categoria do item:', options=lst)
