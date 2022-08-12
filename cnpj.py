@@ -1,17 +1,21 @@
-from turtle import onclick
 from matplotlib.pyplot import show
 import pandas as pd  # pip install pandas openpyxl
 import numpy as np
 import plotly.express as px
-import sys
 import pyautogui
 from fuzzywuzzy import fuzz, process
 import streamlit as st
 from streamlit.legacy_caching import clear_cache
-sys.path.insert(1, 'C:\\Users\\eoestreich\\Documents\\python_training\\jup_lab\\masterdata')
 
-from neodatabases import *
 
+################################## Importar Neodatabases ##################################
+def connect_azure_training(database='datascience-neogrid'):
+    server = 'datascience-neogrid.database.windows.net'
+    username='rerodrigues'
+    password = 'Analytics2021'
+    driver = 'ODBC Driver 17 for SQL Server'
+    string_conexao = 'DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password+';'    
+    return pyodbc.connect(string_conexao)
 st.set_page_config(page_title="CNPJ Insights",
                    page_icon=":bar_chart:",
                    layout="wide")
